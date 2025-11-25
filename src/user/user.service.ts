@@ -44,4 +44,21 @@ export class UserService {
     if (!user) throw new NotFoundException('User not found');
     return this.stripPassword(user);
   }
+
+  create(dto: CreateUserDto): PublicUser {
+    const now = Date.now();
+
+    const newUser: User = {
+      id: randomUUID(),
+      login: dto.login,
+      password: dto.password,
+      version: 1,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    this.users.push(newUser);
+
+    return this.stripPassword(newUser);
+  }
 }
