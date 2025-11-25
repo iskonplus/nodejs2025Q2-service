@@ -10,18 +10,10 @@ export class UserService {
   private users: User[] = [
     {
       login: 'test-1',
-      password: '12345',
-      id: '1',
+      password: '111',
+      id: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
       version: 1,
-      createdAt: 0,
-      updatedAt: 0,
-    },
-    {
-      login: 'test-2',
-      password: '12345',
-      id: '2',
-      version: 1,
-      createdAt: 0,
+      createdAt: 122121212121,
       updatedAt: 0,
     },
   ];
