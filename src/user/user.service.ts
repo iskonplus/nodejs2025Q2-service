@@ -1,12 +1,9 @@
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { User, PublicUser } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { randomUUID } from 'crypto';
+import { httpErrors } from '../handleErrors/http-errors';
 
 @Injectable()
 export class UserService {
@@ -41,7 +38,7 @@ export class UserService {
   findOne(id: string): PublicUser {
     const user = this.users.find((u) => u.id === id);
 
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw httpErrors.notFound('User not found');
     return this.stripPassword(user);
   }
 
@@ -65,10 +62,10 @@ export class UserService {
   updatePassword(id: string, dto: UpdatePasswordDto): PublicUser {
     const user = this.users.find((u) => u.id === id);
 
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw httpErrors.notFound('User not found');
 
     if (user.password !== dto.oldPassword) {
-      throw new ForbiddenException('Old password is wrong');
+      throw httpErrors.forbidden('Old password is wrong');
     }
 
     user.password = dto.newPassword;
@@ -80,7 +77,7 @@ export class UserService {
 
   deleteUser(id: string): void {
     const userIndex = this.users.findIndex((u) => u.id === id);
-    if (userIndex === -1) throw new NotFoundException('User not found');
+    if (userIndex === -1) throw httpErrors.notFound('User not found');
     this.users.splice(userIndex, 1);
   }
 }
