@@ -61,4 +61,20 @@ export class UserService {
 
     return this.stripPassword(newUser);
   }
+
+  updatePassword(id: string, dto: UpdatePasswordDto): PublicUser {
+    const user = this.users.find((u) => u.id === id);
+
+    if (!user) throw new NotFoundException('User not found');
+
+    if (user.password !== dto.oldPassword) {
+      throw new ForbiddenException('Old password is wrong');
+    }
+
+    user.password = dto.newPassword;
+    user.version += 1;
+    user.updatedAt = Date.now();
+
+    return this.stripPassword(user);
+  }
 }
