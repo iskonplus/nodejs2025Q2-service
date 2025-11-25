@@ -15,7 +15,7 @@ export class UserService {
       login: 'test-1',
       password: '12345',
       id: '1',
-      version: 0,
+      version: 1,
       createdAt: 0,
       updatedAt: 0,
     },
@@ -23,7 +23,7 @@ export class UserService {
       login: 'test-2',
       password: '12345',
       id: '2',
-      version: 0,
+      version: 1,
       createdAt: 0,
       updatedAt: 0,
     },
@@ -76,5 +76,11 @@ export class UserService {
     user.updatedAt = Date.now();
 
     return this.stripPassword(user);
+  }
+
+  deleteUser(id: string): void {
+    const userIndex = this.users.findIndex((u) => u.id === id);
+    if (userIndex === -1) throw new NotFoundException('User not found');
+    this.users.splice(userIndex, 1);
   }
 }
