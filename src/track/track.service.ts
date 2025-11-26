@@ -47,4 +47,11 @@ export class TrackService {
 
     return track;
   }
+
+  delete(id: string): void {
+    const index = this.tracks.findIndex((track) => track.id === id);
+    if (index === -1) throw httpErrors.notFound('Track not found');
+
+    this.tracks.splice(index, 1);
+  }
 }

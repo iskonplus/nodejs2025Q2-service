@@ -4,7 +4,9 @@ import { TrackService } from './track.service';
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Param,
   ParseUUIDPipe,
   Post,
@@ -36,5 +38,11 @@ export class TrackController {
     @Body() dto: UpdateTrackDto,
   ) {
     return this.trackService.updateTrack(id, dto);
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return this.trackService.delete(id);
   }
 }
