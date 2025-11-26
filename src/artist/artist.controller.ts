@@ -1,5 +1,5 @@
 import { ArtistService } from './artist.service';
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
 
 @Controller('artist')
 export class ArtistController {
@@ -8,5 +8,10 @@ export class ArtistController {
   @Get()
   getAllArtists() {
     return this.artistService.getAllArtists();
+  }
+
+  @Get(':id')
+  getArtistById(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return this.artistService.findOne(id);
   }
 }
