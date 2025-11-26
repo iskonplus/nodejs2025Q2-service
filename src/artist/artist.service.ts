@@ -9,7 +9,7 @@ import { UpdateArtistDto } from './dto/update-artist.dto';
 export class ArtistService {
   private artists: Artist[] = [
     {
-      id: '5f8c0b3e-0d7a-4e4f-a77f-6cf5e7e3b451',
+      id: '5f8c0b3e-0d7a-4e4f-a77f-6cf5e7e3b452',
       name: 'Artist One',
       grammy: true,
     },
