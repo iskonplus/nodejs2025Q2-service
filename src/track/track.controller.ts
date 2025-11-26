@@ -1,5 +1,13 @@
+import { CreateTrackDto } from './dto/create-track.dto';
 import { TrackService } from './track.service';
-import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+} from '@nestjs/common';
 
 @Controller('track')
 export class TrackController {
@@ -13,5 +21,10 @@ export class TrackController {
   @Get(':id')
   getTrackById(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return this.trackService.findOne(id);
+  }
+
+  @Post()
+  createTrack(@Body() dto: CreateTrackDto) {
+    return this.trackService.create(dto);
   }
 }

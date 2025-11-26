@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Track } from './track.entity';
 import { httpErrors } from 'src/handleErrors/http-errors';
+import { CreateTrackDto } from './dto/create-track.dto';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class TrackService {
@@ -23,5 +25,12 @@ export class TrackService {
     if (!track) throw httpErrors.notFound('Track not found');
 
     return track;
+  }
+
+  create(dto: CreateTrackDto): Track {
+    const newTrack = { id: randomUUID(), ...dto };
+    this.tracks.push(newTrack);
+
+    return newTrack;
   }
 }
