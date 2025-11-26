@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Album } from './album.entity';
 import { httpErrors } from 'src/handleErrors/http-errors';
+import { CreateAlbumDto } from './dto/create-album.dto';
 
 @Injectable()
 export class AlbumService {
@@ -22,5 +23,18 @@ export class AlbumService {
 
     if (!album) throw httpErrors.notFound('Album not found');
     return album;
+  }
+
+  create(dto: CreateAlbumDto): Album {
+    const newAlbum: Album = {
+      id: crypto.randomUUID(),
+      name: dto.name,
+      year: dto.year,
+      artistId: dto.artistId || null,
+    };
+
+    this.albums.push(newAlbum);
+
+    return newAlbum;
   }
 }
