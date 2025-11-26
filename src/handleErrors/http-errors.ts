@@ -1,4 +1,8 @@
-import { NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  NotFoundException,
+  ForbiddenException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 
 export const httpErrors = {
   notFound: (message: string) => {
@@ -7,5 +11,9 @@ export const httpErrors = {
 
   forbidden: (message: string) => {
     return new ForbiddenException(message);
+  },
+
+  unprocessable: (message: string) => {
+    return new UnprocessableEntityException(message);
   },
 };
