@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Artist } from './artist.entity';
 import { httpErrors } from 'src/handleErrors/http-errors';
+import { CreateArtistDto } from './dto/create-artist.dto';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class ArtistService {
@@ -20,5 +22,16 @@ export class ArtistService {
     const artist = this.artists.find((artist) => artist.id === id);
     if (!artist) throw httpErrors.notFound('Artist not found');
     return artist;
+  }
+
+  create(dto: CreateArtistDto): Artist {
+    const newArtist: Artist = {
+      id: randomUUID(),
+      name: dto.name,
+      grammy: dto.grammy,
+    };
+
+    this.artists.push(newArtist);
+    return newArtist;
   }
 }
