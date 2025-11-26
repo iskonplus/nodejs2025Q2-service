@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Track } from './track.entity';
 import { httpErrors } from 'src/handleErrors/http-errors';
 import { CreateTrackDto } from './dto/create-track.dto';
+import { UpdateTrackDto } from './dto/update-track.dto';
 import { randomUUID } from 'crypto';
 
 @Injectable()
@@ -32,5 +33,18 @@ export class TrackService {
     this.tracks.push(newTrack);
 
     return newTrack;
+  }
+
+  updateTrack(id: string, dto: UpdateTrackDto): Track {
+    const track = this.tracks.find((track) => track.id === id);
+
+    if (!track) throw httpErrors.notFound('Track not found');
+
+    track.name = dto.name ?? track.name;
+    track.artistId = dto.artistId ?? track.artistId;
+    track.albumId = dto.albumId ?? track.albumId;
+    track.duration = dto.duration ?? track.duration;
+
+    return track;
   }
 }
