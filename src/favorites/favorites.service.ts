@@ -50,4 +50,25 @@ export class FavoritesService {
     }
     favoritesStore.artists.splice(index, 1);
   }
+
+  addAlbum(id: string) {
+    try {
+      const album = this.albumService.findOne(id);
+      if (!favoritesStore.albums.includes(id)) {
+        favoritesStore.albums.push(id);
+      }
+
+      return { message: `Album: ${album.name} added to favorites` };
+    } catch {
+      throw httpErrors.unprocessable('Album does not exist');
+    }
+  }
+
+  removeAlbum(id: string): void {
+    const index = favoritesStore.albums.indexOf(id);
+    if (index === -1) {
+      throw httpErrors.notFound('Album not found in favorites');
+    }
+    favoritesStore.albums.splice(index, 1);
+  }
 }

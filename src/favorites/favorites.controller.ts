@@ -27,4 +27,15 @@ export class FavoritesController {
   removeArtist(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return this.favoritesService.removeArtist(id);
   }
+
+  @Post('album/:id')
+  addAlbum(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return this.favoritesService.addAlbum(id);
+  }
+
+  @Delete('album/:id')
+  @HttpCode(204)
+  removeAlbum(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return this.favoritesService.removeAlbum(id);
+  }
 }
