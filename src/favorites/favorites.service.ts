@@ -1,9 +1,10 @@
-import { AlbumService } from 'src/album/album.service';
-import { ArtistService } from './../artist/artist.service';
+import { AlbumService } from '../album/album.service';
+import { ArtistService } from '../artist/artist.service';
+import { TrackService } from '../track/track.service';
 import { Injectable } from '@nestjs/common';
-import { TrackService } from 'src/track/track.service';
 import { favoritesStore } from './favorites.store';
 import { FavoritesResponse } from './favorites-response.interface';
+import { httpErrors } from 'src/handleErrors/http-errors';
 
 @Injectable()
 export class FavoritesService {
@@ -27,5 +28,26 @@ export class FavoritesService {
     );
 
     return { artists, albums, tracks };
+  }
+
+  addArtist(id: string) {
+    try {
+      const artist = this.artistService.findOne(id);
+      if (!favoritesStore.artists.includes(id)) {
+        favoritesStore.artists.push(id);
+      }
+
+      return { message: `Artist: ${artist.name} added to favorites` };
+    } catch {
+      throw httpErrors.unprocessable('Artist does not exist');
+    }
+  }
+
+  removeArtist(id: string): void {
+    const index = favoritesStore.artists.indexOf(id);
+    if (index === -1) {
+      throw httpErrors.notFound('Artist not found in favorites');
+    }
+    favoritesStore.artists.splice(index, 1);
   }
 }
