@@ -3,6 +3,7 @@ import { Artist } from './artist.entity';
 import { httpErrors } from 'src/handleErrors/http-errors';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { randomUUID } from 'crypto';
+import { UpdateArtistDto } from './dto/update-artist.dto';
 
 @Injectable()
 export class ArtistService {
@@ -33,5 +34,15 @@ export class ArtistService {
 
     this.artists.push(newArtist);
     return newArtist;
+  }
+
+  updateArtist(id: string, dto: UpdateArtistDto): Artist {
+    const artist = this.artists.find((artist) => artist.id === id);
+    if (!artist) throw httpErrors.notFound('Artist not found');
+
+    artist.name = dto.name ?? artist.name;
+    artist.grammy = dto.grammy ?? artist.grammy;
+
+    return artist;
   }
 }

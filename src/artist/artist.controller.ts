@@ -6,8 +6,10 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Put,
 } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
+import { UpdateArtistDto } from './dto/update-artist.dto';
 
 @Controller('artist')
 export class ArtistController {
@@ -26,5 +28,13 @@ export class ArtistController {
   @Post()
   createArtist(@Body() dto: CreateArtistDto) {
     return this.artistService.create(dto);
+  }
+
+  @Put(':id')
+  updateArtist(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Body() dto: UpdateArtistDto,
+  ) {
+    return this.artistService.updateArtist(id, dto);
   }
 }
