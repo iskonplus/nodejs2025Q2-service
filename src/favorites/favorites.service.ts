@@ -71,4 +71,25 @@ export class FavoritesService {
     }
     favoritesStore.albums.splice(index, 1);
   }
+
+  addTrack(id: string) {
+    try {
+      const track = this.trackService.findOne(id);
+      if (!favoritesStore.tracks.includes(id)) {
+        favoritesStore.tracks.push(id);
+      }
+
+      return { message: `Track: ${track.name} added to favorites` };
+    } catch {
+      throw httpErrors.unprocessable('Track does not exist');
+    }
+  }
+
+  removeTrack(id: string): void {
+    const index = favoritesStore.tracks.indexOf(id);
+    if (index === -1) {
+      throw httpErrors.notFound('Track not found in favorites');
+    }
+    favoritesStore.tracks.splice(index, 1);
+  }
 }
