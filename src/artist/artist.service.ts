@@ -45,4 +45,11 @@ export class ArtistService {
 
     return artist;
   }
+
+  deleteArtist(id: string): void {
+    const artistIndex = this.artists.findIndex((artist) => artist.id === id);
+    if (artistIndex === -1) throw httpErrors.notFound('Artist not found');
+
+    this.artists.splice(artistIndex, 1);
+  }
 }
