@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Param,
   ParseUUIDPipe,
   Post,
@@ -36,5 +38,11 @@ export class AlbumController {
     @Body() dto: UpdateAlbumDto,
   ) {
     return this.albumService.updateAlbum(id, dto);
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return this.albumService.delete(id);
   }
 }

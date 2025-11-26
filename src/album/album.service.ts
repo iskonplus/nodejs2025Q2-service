@@ -49,4 +49,12 @@ export class AlbumService {
 
     return album;
   }
+
+  delete(id: string): void {
+    const index = this.albums.findIndex((album) => album.id === id);
+
+    if (index === -1) throw httpErrors.notFound('Album not found');
+
+    this.albums.splice(index, 1);
+  }
 }
