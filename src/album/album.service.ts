@@ -14,7 +14,7 @@ export class AlbumService {
     {
       name: 'The Marshall Maters LP',
       year: 2000,
-      artistId: null,
+      artistId: '5f8c0b3e-0d7a-4e4f-a77f-6cf5e7e3b452',
       id: '5f8c0b3e-0d7a-4e4f-a77f-6cf5e7e3b451',
     },
   ];

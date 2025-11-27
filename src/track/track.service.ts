@@ -12,8 +12,8 @@ export class TrackService {
     {
       id: '5f8c0b3e-0d7a-4e4f-a77f-6cf5e7e3b453',
       name: 'Track 1',
-      artistId: null,
-      albumId: null,
+      artistId: '5f8c0b3e-0d7a-4e4f-a77f-6cf5e7e3b452',
+      albumId: '5f8c0b3e-0d7a-4e4f-a77f-6cf5e7e3b451',
       duration: 210,
     },
   ];
