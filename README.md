@@ -34,7 +34,7 @@ npm run start
 ```
 By default, the service will be available at:
 
-```text
+```bash
 http://localhost:4000
 ```
 
@@ -52,7 +52,7 @@ On a correct implementation you should see all suites passing, for example:
 	•	users.e2e.spec.ts
 
 ## 🗂 Project structure (high-level)
-```text
+```bash
 src/
   user/
     user.module.ts
@@ -113,7 +113,7 @@ src/
     
 ## 👤 Users (/user)
 
-```Model
+```bash
 interface User {
   id: string;        // uuid v4
   login: string;
@@ -149,7 +149,7 @@ Deletes a user.
 
 ## 🎤 Artists (/artist)
 
-```Model
+```bash
 interface Artist {
   id: string;   // uuid v4
   name: string;
@@ -184,7 +184,7 @@ When an Artist is deleted:
 
 ## 💿 Albums (/album)
 
-```Model
+```bash
 interface Album {
   id: string;           // uuid v4
   name: string;
@@ -219,7 +219,7 @@ When an Album is deleted:
 
 ## 🎵 Tracks (/track)
 
-```Model
+```bash
 interface Track {
   id: string;             // uuid v4
   name: string;
@@ -256,7 +256,7 @@ When a Track is deleted:
 
 ## ⭐ Favorites (/favs)
 
-```Model
+```bash
 interface Track {
   id: string;             // uuid v4
   name: string;
@@ -269,7 +269,7 @@ Internal storage
 
 Favorites are stored by id:
 
-```
+```bash
 interface Favorites {
   artists: string[]; // favorite artist ids
   albums: string[];  // favorite album ids
@@ -278,7 +278,7 @@ interface Favorites {
 ```
 An in-memory singleton store is used:
 
-```
+```bash
 export const favoritesStore: Favorites = {
   artists: [],
   albums: [],
@@ -288,7 +288,7 @@ export const favoritesStore: Favorites = {
 Response format for GET /favs
 
 The response must include full objects (not ids):
-```
+```bash
 interface FavoritesResponse {
   artists: Artist[];
   albums: Album[];
