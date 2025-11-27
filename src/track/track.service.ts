@@ -4,6 +4,7 @@ import { httpErrors } from 'src/handleErrors/http-errors';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { randomUUID } from 'crypto';
+import { favoritesStore } from '../favorites/favorites.store';
 
 @Injectable()
 export class TrackService {
@@ -53,5 +54,25 @@ export class TrackService {
     if (index === -1) throw httpErrors.notFound('Track not found');
 
     this.tracks.splice(index, 1);
+
+    favoritesStore.tracks = favoritesStore.tracks.filter(
+      (trackId) => trackId !== id,
+    );
+  }
+
+  clearArtistReferences(artistId: string) {
+    this.tracks.forEach((track) => {
+      if (track.artistId === artistId) {
+        track.artistId = null;
+      }
+    });
+  }
+
+  clearAlbumReferences(albumId: string) {
+    this.tracks.forEach((track) => {
+      if (track.albumId === albumId) {
+        track.albumId = null;
+      }
+    });
   }
 }

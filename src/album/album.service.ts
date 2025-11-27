@@ -3,9 +3,13 @@ import { Album } from './album.entity';
 import { httpErrors } from 'src/handleErrors/http-errors';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
+import { favoritesStore } from '../favorites/favorites.store';
+import { TrackService } from '../track/track.service';
 
 @Injectable()
 export class AlbumService {
+  constructor(private readonly trackService: TrackService) {}
+
   private albums: Album[] = [
     {
       name: 'The Marshall Maters LP',
@@ -56,5 +60,19 @@ export class AlbumService {
     if (index === -1) throw httpErrors.notFound('Album not found');
 
     this.albums.splice(index, 1);
+
+    favoritesStore.albums = favoritesStore.albums.filter(
+      (albumId) => albumId !== id,
+    );
+
+    this.trackService.clearAlbumReferences(id);
+  }
+
+  clearArtistReferences(artistId: string) {
+    this.albums.forEach((album) => {
+      if (album.artistId === artistId) {
+        album.artistId = null;
+      }
+    });
   }
 }
