@@ -20,6 +20,11 @@ RUN npm install --omit=dev
 
 COPY --from=builder /app/dist ./dist
 
+COPY --from=builder /app/doc ./doc
+
+COPY --from=builder /app/prisma ./prisma
+COPY prisma.config.ts ./
+
 EXPOSE 4000
 
 CMD ["node", "dist/src/main.js"]
