@@ -4,40 +4,37 @@ import { httpErrors } from 'src/handleErrors/http-errors';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { randomUUID } from 'crypto';
-import { favoritesStore } from '../favorites/favorites.store';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { FavoritesService } from 'src/favorites/favorites.service';
 
 @Injectable()
 export class TrackService {
-  private tracks: Track[] = [
-    {
-      id: '5f8c0b3e-0d7a-4e4f-a77f-6cf5e7e3b453',
-      name: 'Track 1',
-      artistId: '5f8c0b3e-0d7a-4e4f-a77f-6cf5e7e3b452',
-      albumId: '5f8c0b3e-0d7a-4e4f-a77f-6cf5e7e3b451',
-      duration: 210,
-    },
-  ];
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly favoritesService: FavoritesService,
+  ) {}
 
-  getAllTracks(): Track[] {
-    return this.tracks;
+  async getAllTracks(): Promise<Track[]> {
+    const tracks = await this.prisma.track.findMany();
+    return tracks;
   }
 
-  findOne(id: string): Track {
-    const track = this.tracks.find((track) => track.id === id);
+  async findOne(id: string): Promise<Track> {
+    const track = await this.prisma.track.findUnique({ where: { id } });
     if (!track) throw httpErrors.notFound('Track not found');
 
     return track;
   }
 
-  create(dto: CreateTrackDto): Track {
+  async create(dto: CreateTrackDto): Promise<Track> {
     const newTrack = { id: randomUUID(), ...dto };
-    this.tracks.push(newTrack);
+    await this.prisma.track.create({ data: newTrack });
 
     return newTrack;
   }
 
-  updateTrack(id: string, dto: UpdateTrackDto): Track {
-    const track = this.tracks.find((track) => track.id === id);
+  async updateTrack(id: string, dto: UpdateTrackDto): Promise<Track> {
+    const track = await this.prisma.track.findUnique({ where: { id } });
 
     if (!track) throw httpErrors.notFound('Track not found');
 
@@ -46,33 +43,29 @@ export class TrackService {
     track.albumId = dto.albumId ?? track.albumId;
     track.duration = dto.duration ?? track.duration;
 
+    await this.prisma.track.update({ where: { id }, data: track });
     return track;
   }
 
-  delete(id: string): void {
-    const index = this.tracks.findIndex((track) => track.id === id);
-    if (index === -1) throw httpErrors.notFound('Track not found');
+  async delete(id: string): Promise<void> {
+    const track = await this.prisma.track.findUnique({ where: { id } });
+    if (!track) throw httpErrors.notFound('Track not found');
 
-    this.tracks.splice(index, 1);
-
-    favoritesStore.tracks = favoritesStore.tracks.filter(
-      (trackId) => trackId !== id,
-    );
+    await this.favoritesService.removeTrack(id);
+    await this.prisma.track.delete({ where: { id } });
   }
 
-  clearArtistReferences(artistId: string) {
-    this.tracks.forEach((track) => {
-      if (track.artistId === artistId) {
-        track.artistId = null;
-      }
+  async clearArtistReferences(artistId: string): Promise<void> {
+    await this.prisma.track.updateMany({
+      where: { artistId },
+      data: { artistId: null },
     });
   }
 
-  clearAlbumReferences(albumId: string) {
-    this.tracks.forEach((track) => {
-      if (track.albumId === albumId) {
-        track.albumId = null;
-      }
+  async clearAlbumReferences(albumId: string): Promise<void> {
+    await this.prisma.track.updateMany({
+      where: { albumId },
+      data: { albumId: null },
     });
   }
 }

@@ -5,6 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { favoritesStore } from './favorites.store';
 import { FavoritesResponse } from './favorites-response.interface';
 import { httpErrors } from 'src/handleErrors/http-errors';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class FavoritesService {
@@ -12,6 +13,7 @@ export class FavoritesService {
     private readonly artistService: ArtistService,
     private readonly albumService: AlbumService,
     private readonly trackService: TrackService,
+    private readonly prisma: PrismaService,
   ) {}
 
   getAllFavorites(): FavoritesResponse {
@@ -64,12 +66,10 @@ export class FavoritesService {
     }
   }
 
-  removeAlbum(id: string): void {
-    const index = favoritesStore.albums.indexOf(id);
-    if (index === -1) {
-      throw httpErrors.notFound('Album not found in favorites');
-    }
-    favoritesStore.albums.splice(index, 1);
+  async removeAlbum(albumId: string): Promise<void> {
+    await this.prisma.favoritesAlbum.deleteMany({
+      where: { albumId },
+    });
   }
 
   addTrack(id: string) {
