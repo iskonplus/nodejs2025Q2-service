@@ -8,16 +8,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class UserService {
-  // private users: User[] = [
-  //   {
-  //     login: 'test-1',
-  //     password: '111',
-  //     id: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
-  //     version: 1,
-  //     createdAt: 122121212121,
-  //     updatedAt: 0,
-  //   },
-  // ];
   constructor(private readonly prisma: PrismaService) {}
 
   private stripPassword(user: User): PublicUser {

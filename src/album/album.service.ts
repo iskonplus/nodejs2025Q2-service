@@ -3,34 +3,31 @@ import { Album } from './album.entity';
 import { httpErrors } from 'src/handleErrors/http-errors';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import { favoritesStore } from '../favorites/favorites.store';
 import { TrackService } from '../track/track.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { FavoritesService } from 'src/favorites/favorites.service';
 
 @Injectable()
 export class AlbumService {
-  constructor(private readonly trackService: TrackService) {}
+  constructor(
+    private readonly trackService: TrackService,
+    private readonly prisma: PrismaService,
+    private readonly favoritesService: FavoritesService,
+  ) {}
 
-  private albums: Album[] = [
-    {
-      name: 'The Marshall Maters LP',
-      year: 2000,
-      artistId: '5f8c0b3e-0d7a-4e4f-a77f-6cf5e7e3b452',
-      id: '5f8c0b3e-0d7a-4e4f-a77f-6cf5e7e3b451',
-    },
-  ];
-
-  getAllAlbums(): Album[] {
-    return this.albums;
+  async getAllAlbums(): Promise<Album[]> {
+    const albums = await this.prisma.album.findMany();
+    return albums;
   }
 
-  findOne(id: string): Album {
-    const album = this.albums.find((album) => album.id === id);
+  async findOne(id: string): Promise<Album> {
+    const album = await this.prisma.album.findUnique({ where: { id } });
 
     if (!album) throw httpErrors.notFound('Album not found');
     return album;
   }
 
-  create(dto: CreateAlbumDto): Album {
+  async create(dto: CreateAlbumDto): Promise<Album> {
     const newAlbum: Album = {
       id: crypto.randomUUID(),
       name: dto.name,
@@ -38,12 +35,12 @@ export class AlbumService {
       artistId: dto.artistId || null,
     };
 
-    this.albums.push(newAlbum);
+    await this.prisma.album.create({ data: newAlbum });
 
     return newAlbum;
   }
-  updateAlbum(id: string, dto: UpdateAlbumDto): Album {
-    const album = this.albums.find((album) => album.id === id);
+  async updateAlbum(id: string, dto: UpdateAlbumDto): Promise<Album> {
+    const album = await this.prisma.album.findUnique({ where: { id } });
 
     if (!album) throw httpErrors.notFound('Album not found');
 
@@ -51,28 +48,26 @@ export class AlbumService {
     album.year = dto.year ?? album.year;
     album.artistId = dto.artistId ?? album.artistId;
 
+    await this.prisma.album.update({
+      where: { id },
+      data: album,
+    });
+
     return album;
   }
 
-  delete(id: string): void {
-    const index = this.albums.findIndex((album) => album.id === id);
+  async delete(id: string): Promise<void> {
+    const album = await this.prisma.album.findUnique({ where: { id } });
 
-    if (index === -1) throw httpErrors.notFound('Album not found');
+    if (!album) throw httpErrors.notFound('Album not found');
 
-    this.albums.splice(index, 1);
+    await this.prisma.album.delete({ where: { id } });
 
-    favoritesStore.albums = favoritesStore.albums.filter(
-      (albumId) => albumId !== id,
-    );
-
-    this.trackService.clearAlbumReferences(id);
+    await this.favoritesService.removeAlbum(id);
+    await this.trackService.clearAlbumReferences(id);
   }
 
-  clearArtistReferences(artistId: string) {
-    this.albums.forEach((album) => {
-      if (album.artistId === artistId) {
-        album.artistId = null;
-      }
-    });
+  async clearAlbumReferences(id: string): Promise<void> {
+    await this.trackService.clearAlbumReferences(id);
   }
 }
