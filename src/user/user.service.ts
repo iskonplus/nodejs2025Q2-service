@@ -11,8 +11,15 @@ export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
   private stripPassword(user: User): PublicUser {
-    const { password, ...rest } = user;
-    return rest;
+    const publicUser = {
+      id: user.id,
+      login: user.login,
+      version: user.version,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+
+    return publicUser;
   }
 
   private now = () => Math.floor(Date.now() / 1000);
