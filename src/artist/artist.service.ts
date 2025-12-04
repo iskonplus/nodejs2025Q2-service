@@ -4,19 +4,11 @@ import { httpErrors } from 'src/handleErrors/http-errors';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { randomUUID } from 'crypto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { AlbumService } from '../album/album.service';
-import { TrackService } from '../track/track.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { FavoritesService } from 'src/favorites/favorites.service';
 
 @Injectable()
 export class ArtistService {
-  constructor(
-    private readonly albumService: AlbumService,
-    private readonly trackService: TrackService,
-    private readonly favoritesService: FavoritesService,
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async getAllArtists(): Promise<Artist[]> {
     const artists = await this.prisma.artist.findMany();
@@ -58,10 +50,6 @@ export class ArtistService {
   async deleteArtist(id: string): Promise<void> {
     const artist = await this.prisma.artist.findUnique({ where: { id } });
     if (!artist) throw httpErrors.notFound('Artist not found');
-
-    await this.favoritesService.removeArtist(id);
-    await this.albumService.clearArtistReferences(id);
-    await this.trackService.clearArtistReferences(id);
     await this.prisma.artist.delete({ where: { id } });
   }
 }

@@ -32,10 +32,9 @@ model Album {
   name     String
   year     Int
   artistId String?
+  artist   Artist? @relation(fields: [artistId], references: [id], onDelete: SetNull)
 
-  artist Artist? @relation(fields: [artistId], references: [id])
-  tracks Track[]
-
+  tracks      Track[]
   favoritedBy FavoritesAlbum[]
 }
 
@@ -46,27 +45,26 @@ model Track {
   artistId String?
   albumId  String?
 
-  artist Artist? @relation(fields: [artistId], references: [id])
-  album  Album?  @relation(fields: [albumId], references: [id])
+  artist   Artist? @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  album    Album?  @relation(fields: [albumId], references: [id], onDelete: SetNull)
 
   favoritedBy FavoritesTrack[]
 }
 
 model Favorites {
-  id String @id @default(uuid())
-
-  artists FavoritesArtist[]
-  albums  FavoritesAlbum[]
-  tracks  FavoritesTrack[]
+  id       String            @id @default(uuid())
+  artists  FavoritesArtist[]
+  albums   FavoritesAlbum[]
+  tracks   FavoritesTrack[]
 }
 
 model FavoritesArtist {
-  id          String @id @default(uuid())
+  id          String    @id @default(uuid())
   favoritesId String
   artistId    String
 
-  favorites Favorites @relation(fields: [favoritesId], references: [id])
-  artist    Artist    @relation(fields: [artistId], references: [id])
+  favorites Favorites @relation(fields: [favoritesId], references: [id], onDelete: Cascade)
+  artist    Artist    @relation(fields: [artistId], references: [id], onDelete: Cascade)
 }
 
 model FavoritesAlbum {
@@ -74,8 +72,8 @@ model FavoritesAlbum {
   favoritesId String
   albumId     String
 
-  favorites Favorites @relation(fields: [favoritesId], references: [id])
-  album     Album     @relation(fields: [albumId], references: [id])
+  favorites Favorites @relation(fields: [favoritesId], references: [id], onDelete: Cascade)
+  album     Album     @relation(fields: [albumId], references: [id], onDelete: Cascade)
 }
 
 model FavoritesTrack {
@@ -83,6 +81,6 @@ model FavoritesTrack {
   favoritesId String
   trackId     String
 
-  favorites Favorites @relation(fields: [favoritesId], references: [id])
-  track     Track     @relation(fields: [trackId], references: [id])
+  favorites Favorites @relation(fields: [favoritesId], references: [id], onDelete: Cascade)
+  track     Track     @relation(fields: [trackId], references: [id], onDelete: Cascade)
 }

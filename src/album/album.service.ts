@@ -3,17 +3,11 @@ import { Album } from './album.entity';
 import { httpErrors } from 'src/handleErrors/http-errors';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import { TrackService } from '../track/track.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { FavoritesService } from 'src/favorites/favorites.service';
 
 @Injectable()
 export class AlbumService {
-  constructor(
-    private readonly trackService: TrackService,
-    private readonly prisma: PrismaService,
-    private readonly favoritesService: FavoritesService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async getAllAlbums(): Promise<Album[]> {
     const albums = await this.prisma.album.findMany();
@@ -60,14 +54,6 @@ export class AlbumService {
     const album = await this.prisma.album.findUnique({ where: { id } });
 
     if (!album) throw httpErrors.notFound('Album not found');
-
     await this.prisma.album.delete({ where: { id } });
-
-    await this.favoritesService.removeAlbum(id);
-    await this.trackService.clearAlbumReferences(id);
-  }
-
-  async clearAlbumReferences(id: string): Promise<void> {
-    await this.trackService.clearAlbumReferences(id);
   }
 }

@@ -1,19 +1,11 @@
-import { AlbumService } from '../album/album.service';
-import { ArtistService } from '../artist/artist.service';
-import { TrackService } from '../track/track.service';
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import { FavoritesResponse } from './favorites-response.interface';
-import { httpErrors } from 'src/handleErrors/http-errors';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { httpErrors } from '../handleErrors/http-errors';
 
 @Injectable()
 export class FavoritesService {
-  constructor(
-    private readonly artistService: ArtistService,
-    private readonly albumService: AlbumService,
-    private readonly trackService: TrackService,
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   private async getFavorites() {
     return this.prisma.favorites.findFirst();
@@ -32,9 +24,7 @@ export class FavoritesService {
       },
     });
 
-    if (!fav) {
-      return { artists: [], albums: [], tracks: [] };
-    }
+    if (!fav) return { artists: [], albums: [], tracks: [] };
 
     return {
       artists: fav.artists.map((a) => a.artist),
@@ -44,13 +34,8 @@ export class FavoritesService {
   }
 
   async addArtist(id: string) {
-    let artist;
-
-    try {
-      artist = this.artistService.findOne(id);
-    } catch {
-      throw httpErrors.unprocessable('Artist does not exist');
-    }
+    const artist = await this.prisma.artist.findUnique({ where: { id } });
+    if (!artist) throw httpErrors.unprocessable('Artist does not exist');
 
     let fav = await this.getFavorites();
     if (!fav) fav = await this.createFavorites();
@@ -65,32 +50,24 @@ export class FavoritesService {
       });
     }
 
-    return { message: `Artist: ${artist.name} added to favorites` };
+    return { message: `Artist ${artist.name} added to favorites` };
   }
 
   async removeArtist(id: string) {
     const fav = await this.getFavorites();
-    if (!fav) throw httpErrors.notFound('Artist not found in favorites');
+    if (!fav) throw httpErrors.notFound('Artist not in favorites');
 
-    const exists = await this.prisma.favoritesArtist.findFirst({
+    const deleted = await this.prisma.favoritesArtist.deleteMany({
       where: { favoritesId: fav.id, artistId: id },
     });
 
-    if (!exists) throw httpErrors.notFound('Artist not found in favorites');
-
-    await this.prisma.favoritesArtist.deleteMany({
-      where: { favoritesId: fav.id, artistId: id },
-    });
+    if (deleted.count === 0)
+      throw httpErrors.notFound('Artist not in favorites');
   }
 
   async addAlbum(id: string) {
-    let album;
-
-    try {
-      album = this.albumService.findOne(id);
-    } catch {
-      throw httpErrors.unprocessable('Album does not exist');
-    }
+    const album = await this.prisma.album.findUnique({ where: { id } });
+    if (!album) throw httpErrors.unprocessable('Album does not exist');
 
     let fav = await this.getFavorites();
     if (!fav) fav = await this.createFavorites();
@@ -105,32 +82,24 @@ export class FavoritesService {
       });
     }
 
-    return { message: `Album: ${album.name} added to favorites` };
+    return { message: `Album ${album.name} added to favorites` };
   }
 
   async removeAlbum(id: string) {
     const fav = await this.getFavorites();
-    if (!fav) throw httpErrors.notFound('Album not found in favorites');
+    if (!fav) throw httpErrors.notFound('Album not in favorites');
 
-    const exists = await this.prisma.favoritesAlbum.findFirst({
+    const deleted = await this.prisma.favoritesAlbum.deleteMany({
       where: { favoritesId: fav.id, albumId: id },
     });
 
-    if (!exists) throw httpErrors.notFound('Album not found in favorites');
-
-    await this.prisma.favoritesAlbum.deleteMany({
-      where: { favoritesId: fav.id, albumId: id },
-    });
+    if (deleted.count === 0)
+      throw httpErrors.notFound('Album not in favorites');
   }
 
   async addTrack(id: string) {
-    let track;
-
-    try {
-      track = this.trackService.findOne(id);
-    } catch {
-      throw httpErrors.unprocessable('Track does not exist');
-    }
+    const track = await this.prisma.track.findUnique({ where: { id } });
+    if (!track) throw httpErrors.unprocessable('Track does not exist');
 
     let fav = await this.getFavorites();
     if (!fav) fav = await this.createFavorites();
@@ -145,21 +114,18 @@ export class FavoritesService {
       });
     }
 
-    return { message: `Track: ${track.name} added to favorites` };
+    return { message: `Track ${track.name} added to favorites` };
   }
 
   async removeTrack(id: string) {
     const fav = await this.getFavorites();
-    if (!fav) throw httpErrors.notFound('Track not found in favorites');
+    if (!fav) throw httpErrors.notFound('Track not in favorites');
 
-    const exists = await this.prisma.favoritesTrack.findFirst({
+    const deleted = await this.prisma.favoritesTrack.deleteMany({
       where: { favoritesId: fav.id, trackId: id },
     });
 
-    if (!exists) throw httpErrors.notFound('Track not found in favorites');
-
-    await this.prisma.favoritesTrack.deleteMany({
-      where: { favoritesId: fav.id, trackId: id },
-    });
+    if (deleted.count === 0)
+      throw httpErrors.notFound('Track not in favorites');
   }
 }

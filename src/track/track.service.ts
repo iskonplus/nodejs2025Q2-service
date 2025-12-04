@@ -5,14 +5,10 @@ import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { randomUUID } from 'crypto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { FavoritesService } from 'src/favorites/favorites.service';
 
 @Injectable()
 export class TrackService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly favoritesService: FavoritesService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async getAllTracks(): Promise<Track[]> {
     const tracks = await this.prisma.track.findMany();
@@ -50,22 +46,6 @@ export class TrackService {
   async delete(id: string): Promise<void> {
     const track = await this.prisma.track.findUnique({ where: { id } });
     if (!track) throw httpErrors.notFound('Track not found');
-
-    await this.favoritesService.removeTrack(id);
     await this.prisma.track.delete({ where: { id } });
-  }
-
-  async clearArtistReferences(artistId: string): Promise<void> {
-    await this.prisma.track.updateMany({
-      where: { artistId },
-      data: { artistId: null },
-    });
-  }
-
-  async clearAlbumReferences(albumId: string): Promise<void> {
-    await this.prisma.track.updateMany({
-      where: { albumId },
-      data: { albumId: null },
-    });
   }
 }
