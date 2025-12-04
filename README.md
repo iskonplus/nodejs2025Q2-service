@@ -12,9 +12,12 @@ Tech stack: **Node.js 24**, **NestJS**, **PostgreSQL**, **Prisma**, **Docker**.
 - npm ≥ 10  
 - Docker & Docker Compose  
 
-Copy `.env.example` → `.env` before running.
-
 ---
+# Before start
+Copy `.env.example` → `.env` before running.
+```sh
+npm install
+```
 
 # 🚀 Running the Application (Docker — REQUIRED for database)
 
@@ -22,6 +25,7 @@ This is the **main and correct** way to run the project.
 PostgreSQL and Prisma migrations are executed **only inside Docker**.
 
 ### Build and start containers
+Start docker app before
 ```sh
 docker compose build
 docker compose up -d
@@ -34,7 +38,7 @@ The application will be available at:
 ```sh
 docker compose exec app npx prisma migrate deploy
 # or for development:
-docker compose exec app npx prisma migrate dev --name init
+# docker compose exec app npx prisma migrate dev --name init
 ```
 ## Stop containers
 ```sh
