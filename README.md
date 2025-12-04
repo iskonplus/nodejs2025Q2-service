@@ -37,8 +37,6 @@ The application will be available at:
 ## Run Prisma migrations
 ```sh
 docker compose exec app npx prisma migrate deploy
-# or for development:
-# docker compose exec app npx prisma migrate dev --name init
 ```
 ## Stop containers
 ```sh
