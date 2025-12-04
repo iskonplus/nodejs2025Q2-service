@@ -1,6 +1,6 @@
 # Home Library Service
 
-A REST service for managing a “home library”: users, artists, albums, tracks, and favorites.
+A REST API for managing a “home library”: users, artists, albums, tracks, and favorites.
 
 Tech stack: **Node.js 24**, **NestJS**, **PostgreSQL**, **Prisma**, **Docker**.
 
@@ -8,84 +8,70 @@ Tech stack: **Node.js 24**, **NestJS**, **PostgreSQL**, **Prisma**, **Docker**.
 
 ## Requirements
 
-- Node.js >= 24.x  
-- npm >= 10  
-- Docker + Docker Compose  
+- Node.js ≥ 24.x  
+- npm ≥ 10  
+- Docker & Docker Compose  
 
-## Rename `.env.example` `.env`
-## Running locally (without Docker)
-### install dependencies
-```
-npm install
-```
+Copy `.env.example` → `.env` before running.
 
-### generate Prisma client
-```
-npx prisma generate
-```
+---
 
-### apply database migrations in dev mode
-```
-npx prisma migrate dev --name init
-```
+# 🚀 Running the Application (Docker — REQUIRED for database)
 
-### start application
-```
-npm run start:dev
-```
+This is the **main and correct** way to run the project.  
+PostgreSQL and Prisma migrations are executed **only inside Docker**.
 
-The application will be available at:
-	•	API root: http://localhost:4000
-	•	Swagger documentation: http://localhost:4000/doc
-
-## Running in Docker
-### Build and start containers:
-```
+### Build and start containers
+```sh
 docker compose build
 docker compose up -d
-```	
-
+```
 The application will be available at:
 	•	API: http://localhost:4000
 	•	Swagger: http://localhost:4000/doc
 
-### Apply migrations inside the app container:
-```
+## Run Prisma migrations
+```sh
 docker compose exec app npx prisma migrate deploy
 # or for development:
 docker compose exec app npx prisma migrate dev --name init
 ```
-### Stop containers:
-```
+## Stop containers
+```sh
 docker compose down
 ```
 
-## Docker Hub
-### A ready-to-use image is available on Docker Hub:
-```
+# 🐳 Docker Hub Image
+A ready-to-use image is available:
+```sh
 docker pull iskonplus/nodejs2025q2-service-app:latest
 ```
-### Example run:
-```
+
+## Example run (requires external PostgreSQL):
+```sh
 docker run -d \
   -p 4000:4000 \
   --name home-library-app \
   --env-file .env \
   iskonplus/nodejs2025q2-service-app:latest
 ```
-Note: The app container requires PostgreSQL.
-During evaluation, the provided docker-compose.yml is used (app + db on the same network).
+⚠ Note: During evaluation the provided docker-compose.yml is used (app + db on the same network).
+The standalone image requires its own PostgreSQL instance.
 
-## npm Scripts
-	•	npm run start:dev — start NestJS in development mode
-	•	npm run build — build the application
-	•	npm run start:prod — run compiled application (node dist/main)
-	•	npm test — run tests
-	•	npm run lint — run linter
-	•	npm run audit — check package vulnerabilities
+# 📜 npm Scripts
+Script						Description
+---
+npm run start:dev			Run NestJS in dev mode (no DB)
+npm run build				Build the application
+npm run start:prod			Run compiled app
+npm test					Run tests
+npm run lint				Run linter
+npm run audit				Security audit
 
-## Testing
-```
+# 🧪 Testing
+Before running tests, start Docker containers:
+```sh
+docker compose up -d
+docker compose exec app npx prisma migrate deploy
 npm test
 ```
-All tests should pass both locally and when using Docker (after the DB is running).

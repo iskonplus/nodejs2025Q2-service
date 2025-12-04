@@ -17,10 +17,10 @@ import type * as Prisma from "./prismaNamespace"
 
 const config: runtime.GetPrismaClientConfig = {
   "previewFeatures": [],
-  "clientVersion": "7.0.1",
-  "engineVersion": "f09f2815f091dbba658cdcd2264306d88bb5bda6",
+  "clientVersion": "7.1.0",
+  "engineVersion": "ab635e6b9d606fa5c8fb8b1a7f909c3c3c1c98ba",
   "activeProvider": "postgresql",
-  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel User {\n  id        String @id @default(uuid())\n  login     String @unique\n  password  String\n  version   Int    @default(1)\n  createdAt Int\n  updatedAt Int\n}\n\nmodel Artist {\n  id     String  @id @default(uuid())\n  name   String\n  grammy Boolean\n\n  albums Album[]\n  tracks Track[]\n\n  favoritedBy FavoritesArtist[]\n}\n\nmodel Album {\n  id       String  @id @default(uuid())\n  name     String\n  year     Int\n  artistId String?\n\n  artist Artist? @relation(fields: [artistId], references: [id])\n  tracks Track[]\n\n  favoritedBy FavoritesAlbum[]\n}\n\nmodel Track {\n  id       String  @id @default(uuid())\n  name     String\n  duration Int\n  artistId String?\n  albumId  String?\n\n  artist Artist? @relation(fields: [artistId], references: [id])\n  album  Album?  @relation(fields: [albumId], references: [id])\n\n  favoritedBy FavoritesTrack[]\n}\n\nmodel Favorites {\n  id String @id @default(uuid())\n\n  artists FavoritesArtist[]\n  albums  FavoritesAlbum[]\n  tracks  FavoritesTrack[]\n}\n\nmodel FavoritesArtist {\n  id          String @id @default(uuid())\n  favoritesId String\n  artistId    String\n\n  favorites Favorites @relation(fields: [favoritesId], references: [id])\n  artist    Artist    @relation(fields: [artistId], references: [id])\n}\n\nmodel FavoritesAlbum {\n  id          String @id @default(uuid())\n  favoritesId String\n  albumId     String\n\n  favorites Favorites @relation(fields: [favoritesId], references: [id])\n  album     Album     @relation(fields: [albumId], references: [id])\n}\n\nmodel FavoritesTrack {\n  id          String @id @default(uuid())\n  favoritesId String\n  trackId     String\n\n  favorites Favorites @relation(fields: [favoritesId], references: [id])\n  track     Track     @relation(fields: [trackId], references: [id])\n}\n",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../src/generated/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel User {\n  id        String @id @default(uuid())\n  login     String @unique\n  password  String\n  version   Int    @default(1)\n  createdAt Int\n  updatedAt Int\n}\n\nmodel Artist {\n  id     String  @id @default(uuid())\n  name   String\n  grammy Boolean\n\n  albums Album[]\n  tracks Track[]\n\n  favoritedBy FavoritesArtist[]\n}\n\nmodel Album {\n  id       String  @id @default(uuid())\n  name     String\n  year     Int\n  artistId String?\n  artist   Artist? @relation(fields: [artistId], references: [id], onDelete: SetNull)\n\n  tracks      Track[]\n  favoritedBy FavoritesAlbum[]\n}\n\nmodel Track {\n  id       String  @id @default(uuid())\n  name     String\n  duration Int\n  artistId String?\n  albumId  String?\n\n  artist Artist? @relation(fields: [artistId], references: [id], onDelete: SetNull)\n  album  Album?  @relation(fields: [albumId], references: [id], onDelete: SetNull)\n\n  favoritedBy FavoritesTrack[]\n}\n\nmodel Favorites {\n  id      String            @id @default(uuid())\n  artists FavoritesArtist[]\n  albums  FavoritesAlbum[]\n  tracks  FavoritesTrack[]\n}\n\nmodel FavoritesArtist {\n  id          String @id @default(uuid())\n  favoritesId String\n  artistId    String\n\n  favorites Favorites @relation(fields: [favoritesId], references: [id], onDelete: Cascade)\n  artist    Artist    @relation(fields: [artistId], references: [id], onDelete: Cascade)\n}\n\nmodel FavoritesAlbum {\n  id          String @id @default(uuid())\n  favoritesId String\n  albumId     String\n\n  favorites Favorites @relation(fields: [favoritesId], references: [id], onDelete: Cascade)\n  album     Album     @relation(fields: [albumId], references: [id], onDelete: Cascade)\n}\n\nmodel FavoritesTrack {\n  id          String @id @default(uuid())\n  favoritesId String\n  trackId     String\n\n  favorites Favorites @relation(fields: [favoritesId], references: [id], onDelete: Cascade)\n  track     Track     @relation(fields: [trackId], references: [id], onDelete: Cascade)\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -62,7 +62,7 @@ export interface PrismaClientConstructor {
    * const users = await prisma.user.findMany()
    * ```
    * 
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
+   * Read more in our [docs](https://pris.ly/d/client).
    */
 
   new <
@@ -84,7 +84,7 @@ export interface PrismaClientConstructor {
  * const users = await prisma.user.findMany()
  * ```
  * 
- * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client).
+ * Read more in our [docs](https://pris.ly/d/client).
  */
 
 export interface PrismaClient<
@@ -113,7 +113,7 @@ export interface PrismaClient<
    * const result = await prisma.$executeRaw`UPDATE User SET cool = ${true} WHERE email = ${'user@email.com'};`
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $executeRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<number>;
 
@@ -125,7 +125,7 @@ export interface PrismaClient<
    * const result = await prisma.$executeRawUnsafe('UPDATE User SET cool = $1 WHERE email = $2 ;', true, 'user@email.com')
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $executeRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<number>;
 
@@ -136,7 +136,7 @@ export interface PrismaClient<
    * const result = await prisma.$queryRaw`SELECT * FROM User WHERE id = ${1} OR email = ${'user@email.com'};`
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $queryRaw<T = unknown>(query: TemplateStringsArray | Prisma.Sql, ...values: any[]): Prisma.PrismaPromise<T>;
 
@@ -148,7 +148,7 @@ export interface PrismaClient<
    * const result = await prisma.$queryRawUnsafe('SELECT * FROM User WHERE id = $1 OR email = $2;', 1, 'user@email.com')
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/raw-database-access).
+   * Read more in our [docs](https://pris.ly/d/raw-queries).
    */
   $queryRawUnsafe<T = unknown>(query: string, ...values: any[]): Prisma.PrismaPromise<T>;
 
