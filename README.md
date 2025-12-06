@@ -44,21 +44,46 @@ docker compose down
 ```
 
 # 🐳 Docker Hub Image
-A ready-to-use image is available:
+### 1. A ready-to-use image is available:
 ```sh
 docker pull iskonplus/nodejs2025q2-service-app:latest
 ```
 
-## Example run (requires external PostgreSQL):
+### 2. Create a shared network
+```sh
+docker network create home-library-network
+```
+### 3. Run PostgreSQL
 ```sh
 docker run -d \
-  -p 4000:4000 \
+  --name home-library-db \
+  --network home-library-network \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=home_library \
+  -v home_library_pgdata:/var/lib/postgresql/data \
+  -p 5432:5432 \
+  postgres:16-alpine
+```
+### 4. Run app from Docker Hub
+```sh
+docker run -d \
   --name home-library-app \
-  --env-file .env \
+  --network home-library-network \
+  -p 4000:4000 \
+  -e DATABASE_URL="postgresql://postgres:postgres@home-library-db:5432/home_library?schema=public" \
   iskonplus/nodejs2025q2-service-app:latest
 ```
-⚠ Note: During evaluation the provided docker-compose.yml is used (app + db on the same network).
-The standalone image requires its own PostgreSQL instance.
+
+### 5. Apply migrations (required!)
+```sh
+docker exec home-library-app npx prisma migrate deploy
+```
+⚠ Note:
+⚠ The API works here:
+👉 http://localhost:4000
+👉 Swagger: http://localhost:4000/doc
+
 
 # 📜 npm Scripts
 Script						Description
