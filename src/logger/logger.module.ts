@@ -1,5 +1,5 @@
 import { Global, Module } from '@nestjs/common';
-import { LoggingService } from 'src/logging/logging.service';
+import { LoggingService } from 'src/logger/logging.service';
 
 @Global()
 @Module({
