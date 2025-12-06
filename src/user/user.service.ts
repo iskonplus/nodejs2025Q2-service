@@ -67,7 +67,7 @@ export class UserService {
       data: {
         password: dto.newPassword,
         version: user.version + 1,
-        updatedAt: this.now(),
+        updatedAt: this.now() + 1,
       },
     });
 
