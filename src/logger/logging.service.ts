@@ -73,5 +73,6 @@ export class LoggingService implements LoggerService {
     if (!this.isLevelEnabled('fatal')) return;
     const trace = optionalParams.length ? optionalParams.join(' ') : undefined;
     console.error(this.format('FATAL', message, undefined, trace));
+    process.exit(1);
   }
 }
