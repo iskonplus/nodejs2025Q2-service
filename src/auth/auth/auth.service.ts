@@ -5,13 +5,22 @@ import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { httpErrors } from 'src/handleErrors/http-errors';
 import { randomUUID } from 'crypto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async signup(dto: SignupDto) {
     const { login, password } = dto;
+
+    const existing = await this.prisma.user.findUnique({ where: { login } });
+    if (existing) {
+      throw httpErrors.forbidden('User already exists');
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -33,11 +42,31 @@ export class AuthService {
     const { login, password } = dto;
 
     const user = await this.prisma.user.findUnique({ where: { login } });
-    if (!user) throw httpErrors.forbidden('User not found');
+
+    const authFailedError = httpErrors.forbidden('Authentication failed');
+
+    if (!user) {
+      throw authFailedError;
+    }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) throw httpErrors.forbidden('Password is wrong');
+    if (!isPasswordValid) {
+      throw authFailedError;
+    }
 
-    return { message: 'Login successful (tokens will be here!)' };
+    const payload = { userId: user.id, login: user.login };
+
+    const accessToken = await this.jwtService.signAsync(payload, {
+      expiresIn: (process.env.JWT_ACCESS_EXPIRES_IN ?? '15m') as any,
+    });
+
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN ?? '7d') as any,
+    });
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 }

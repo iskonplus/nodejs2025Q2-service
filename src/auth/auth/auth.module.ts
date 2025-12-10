@@ -1,12 +1,23 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from './auth.controller';
+import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { UserModule } from 'src/user/user.module';
+import { AuthController } from './auth.controller';
+import { PrismaModule } from 'src/prisma/prisma.module';
+
+const ACCESS_EXPIRES_IN = Number(process.env.JWT_ACCESS_EXPIRES_IN) || 60 * 15;
 
 @Module({
-  imports: [UserModule],
+  imports: [
+    PrismaModule,
+    JwtModule.register({
+      secret: process.env.JWT_ACCESS_SECRET || 'dev_access_secret',
+      signOptions: {
+        expiresIn: ACCESS_EXPIRES_IN,
+      },
+    }),
+  ],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService],
+  providers: [AuthService],
+  exports: [AuthService],
 })
 export class AuthModule {}
