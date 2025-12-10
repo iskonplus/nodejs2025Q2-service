@@ -12,6 +12,7 @@ import { LoggerModule } from './logger/logger.module';
 import { RequestLoggerMiddleware } from './logger/request-logger.middleware';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './logger/all-exceptions.filter';
+import { AuthModule } from './auth/auth/auth.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AllExceptionsFilter } from './logger/all-exceptions.filter';
     TrackModule,
     FavoritesModule,
     PrismaModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [

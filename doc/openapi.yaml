@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: >
     Home Library Service built with NestJS.  
-    Manages Users, Artists, Albums, Tracks and Favorites in memory.
+    Manages Users, Artists, Albums, Tracks and Favorites using PostgreSQL and Prisma.
 
 servers:
   - url: http://localhost:4000
@@ -702,3 +702,28 @@ components:
           type: string
       required:
         - message
+
+    AuthCredentialsDto:
+      type: object
+      description: Credentials for signup/login
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+      required:
+        - login
+        - password
+
+    AuthTokensResponse:
+      type: object
+      description: JWT tokens pair
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+      required:
+        - accessToken
+        - refreshToken
+        
