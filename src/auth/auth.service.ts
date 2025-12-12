@@ -42,26 +42,24 @@ export class AuthService {
     const { login, password } = dto;
 
     const user = await this.prisma.user.findUnique({ where: { login } });
-
-    const authFailedError = httpErrors.forbidden('Authentication failed');
-
-    if (!user) {
-      throw authFailedError;
-    }
+    if (!user) throw httpErrors.forbidden('User not found');
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      throw authFailedError;
-    }
+    if (!isPasswordValid) throw httpErrors.forbidden('Password is wrong');
 
-    const payload = { userId: user.id, login: user.login };
+    const payload = {
+      userId: user.id,
+      login: user.login,
+    };
 
     const accessToken = await this.jwtService.signAsync(payload, {
-      expiresIn: (process.env.JWT_ACCESS_EXPIRES_IN ?? '15m') as any,
+      secret: process.env.JWT_ACCESS_SECRET,
+      expiresIn: '1h',
     });
 
     const refreshToken = await this.jwtService.signAsync(payload, {
-      expiresIn: (process.env.JWT_REFRESH_EXPIRES_IN ?? '7d') as any,
+      secret: process.env.JWT_REFRESH_SECRET,
+      expiresIn: '7d',
     });
 
     return {
