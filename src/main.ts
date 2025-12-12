@@ -1,9 +1,8 @@
 import { NestFactory } from '@nestjs/core';
-// import { SwaggerModule } from '@nestjs/swagger';
+import { SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-// import * as YAML from 'yamljs';
-// import { join } from 'path';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import * as YAML from 'yamljs';
+import { join } from 'path';
 
 import { AppModule } from './app.module';
 import { PORT } from './config/config';
@@ -27,23 +26,9 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter(logger));
 
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('Home Library Service API')
-    .setDescription('Home Library Service with JWT authorization')
-    .setVersion('1.0.0')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        in: 'header',
-      },
-      'access-token',
-    )
-    .build();
-
-  const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('doc', app, swaggerDocument);
+  const openApiPath = join(process.cwd(), 'doc', 'openapi.yaml');
+  const document = YAML.load(openApiPath);
+  SwaggerModule.setup('doc', app, document);
 
   process.on('uncaughtException', (error: Error) => {
     logger.error(`Uncaught exception: ${error.message}`);
