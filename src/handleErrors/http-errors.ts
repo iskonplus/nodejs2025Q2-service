@@ -2,6 +2,7 @@ import {
   NotFoundException,
   ForbiddenException,
   UnprocessableEntityException,
+  UnauthorizedException,
 } from '@nestjs/common';
 
 export const httpErrors = {
@@ -15,5 +16,9 @@ export const httpErrors = {
 
   unprocessable: (message: string) => {
     return new UnprocessableEntityException(message);
+  },
+
+  unauthorized: (message: string) => {
+    return new UnauthorizedException(message);
   },
 };
