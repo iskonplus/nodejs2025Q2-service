@@ -1,4 +1,5 @@
 {
   "editor.indentSize": "tabSize",
-  "cSpell.words": ["favs"]
+  "cSpell.words": ["favorited", "favs", "pgdata"],
+  "commentTranslate.targetLanguage": "ru"
 }

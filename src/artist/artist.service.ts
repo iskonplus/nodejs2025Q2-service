@@ -4,67 +4,52 @@ import { httpErrors } from 'src/handleErrors/http-errors';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { randomUUID } from 'crypto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { favoritesStore } from '../favorites/favorites.store';
-import { AlbumService } from '../album/album.service';
-import { TrackService } from '../track/track.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ArtistService {
-  constructor(
-    private readonly albumService: AlbumService,
-    private readonly trackService: TrackService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  private artists: Artist[] = [
-    {
-      id: '5f8c0b3e-0d7a-4e4f-a77f-6cf5e7e3b452',
-      name: 'Artist One',
-      grammy: true,
-    },
-  ];
-
-  getAllArtists(): Artist[] {
-    return this.artists;
+  async getAllArtists(): Promise<Artist[]> {
+    const artists = await this.prisma.artist.findMany();
+    return artists;
   }
 
-  findOne(id: string): Artist {
-    const artist = this.artists.find((artist) => artist.id === id);
+  async findOne(id: string): Promise<Artist> {
+    const artist = await this.prisma.artist.findUnique({ where: { id } });
     if (!artist) throw httpErrors.notFound('Artist not found');
     return artist;
   }
 
-  create(dto: CreateArtistDto): Artist {
+  async create(dto: CreateArtistDto): Promise<Artist> {
     const newArtist: Artist = {
       id: randomUUID(),
       name: dto.name,
       grammy: dto.grammy,
     };
 
-    this.artists.push(newArtist);
+    await this.prisma.artist.create({ data: newArtist });
     return newArtist;
   }
 
-  updateArtist(id: string, dto: UpdateArtistDto): Artist {
-    const artist = this.artists.find((artist) => artist.id === id);
+  async updateArtist(id: string, dto: UpdateArtistDto): Promise<Artist> {
+    const artist = await this.prisma.artist.findUnique({ where: { id } });
     if (!artist) throw httpErrors.notFound('Artist not found');
 
     artist.name = dto.name ?? artist.name;
     artist.grammy = dto.grammy ?? artist.grammy;
 
+    await this.prisma.artist.update({
+      where: { id },
+      data: artist,
+    });
+
     return artist;
   }
 
-  deleteArtist(id: string): void {
-    const artistIndex = this.artists.findIndex((artist) => artist.id === id);
-    if (artistIndex === -1) throw httpErrors.notFound('Artist not found');
-
-    this.artists.splice(artistIndex, 1);
-
-    favoritesStore.artists = favoritesStore.artists.filter(
-      (artistId) => artistId !== id,
-    );
-
-    this.albumService.clearArtistReferences(id);
-    this.trackService.clearArtistReferences(id);
+  async deleteArtist(id: string): Promise<void> {
+    const artist = await this.prisma.artist.findUnique({ where: { id } });
+    if (!artist) throw httpErrors.notFound('Artist not found');
+    await this.prisma.artist.delete({ where: { id } });
   }
 }

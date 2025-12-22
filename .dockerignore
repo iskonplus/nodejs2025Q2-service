@@ -1,0 +1,23 @@
+# Node
+node_modules
+npm-debug.log
+yarn.lock
+pnpm-lock.yaml
+
+# Build output
+coverage
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Git
+.git
+.gitignore
+
+# OS / editor
+.DS_Store
+.idea
+.vscode
+*.swp
