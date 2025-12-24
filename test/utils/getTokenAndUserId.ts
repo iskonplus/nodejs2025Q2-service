@@ -1,35 +1,38 @@
 import { authRoutes } from '../endpoints';
 
-const createUserDto = {
-  login: 'TEST_AUTH_LOGIN',
-  password: 'Tu6!@#%&',
-};
-
 const getTokenAndUserId = async (request) => {
-  // create user
-  const {
-    body: { id: mockUserId },
-  } = await request
+  const createUserDto = {
+    login: `TEST_AUTH_LOGIN_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+    password: 'Tu6!@#%&',
+  };
+
+  const signupRes = await request
     .post(authRoutes.signup)
     .set('Accept', 'application/json')
     .send(createUserDto);
 
-  // get token
-  const {
-    body: { accessToken, refreshToken },
-  } = await request
+  if (signupRes.statusCode !== 201) {
+    throw new Error(
+      `Signup failed in getTokenAndUserId, status: ${signupRes.statusCode}`,
+    );
+  }
+
+  const mockUserId = signupRes.body?.id;
+
+  const loginRes = await request
     .post(authRoutes.login)
     .set('Accept', 'application/json')
     .send(createUserDto);
 
-  if (mockUserId === undefined || accessToken === undefined) {
+  const accessToken = loginRes.body?.accessToken;
+  const refreshToken = loginRes.body?.refreshToken;
+
+  if (!mockUserId || !accessToken) {
     throw new Error('Authorization is not implemented');
   }
 
-  const token = `Bearer ${accessToken}`;
-
   return {
-    token,
+    token: `Bearer ${accessToken}`,
     accessToken,
     refreshToken,
     mockUserId,
